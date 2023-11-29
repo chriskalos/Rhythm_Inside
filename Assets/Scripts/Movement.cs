@@ -32,7 +32,7 @@ public class Movement : MonoBehaviour
         // Flip the character if moving left or right
         if (dx != 0)
         {
-            transform.localScale = new Vector3(Mathf.Sign(dx), 1, 1);
+            transform.localScale = new Vector3(Mathf.Sign(dx), transform.localScale.y, transform.localScale.z);
         }
     }
 
