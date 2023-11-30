@@ -14,6 +14,7 @@ public class Movement : MonoBehaviour
     {
         _characterController = GetComponent<CharacterController>();
         _rigidbody = GetComponent<Rigidbody>();
+        _velocity.y = -5f; // Some downward momentum so that the character doesn't fall too slowly in the beginning
     }
 
     void Update()
@@ -27,7 +28,15 @@ public class Movement : MonoBehaviour
         float currentSpeed = Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : walkSpeed;
         Vector3 moveDirection = _inputVector * currentSpeed;
         
+        // Apply gravity (increasing velocity downwards)
+        if (_characterController.isGrounded && _velocity.y < 0)
+        {
+            _velocity.y = -5f; // Reset the downward velocity when grounded
+        }
         _velocity.y += Physics.gravity.y * Time.deltaTime; // Apply gravity
+        
+        // Debug.Log(_characterController.isGrounded);
+        // Debug.Log(_velocity.y);
         
         // Combine movement and gravity, then move the character
         _characterController.Move((moveDirection + _velocity) * Time.deltaTime);
