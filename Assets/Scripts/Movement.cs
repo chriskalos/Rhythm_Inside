@@ -15,6 +15,7 @@ public class Movement : MonoBehaviour
     void Update()
     {
         float dx = Input.GetAxisRaw("Horizontal");
+        float dy = _rigidbody.velocity.y; // Keep the existing vertical velocity
         float dz = Input.GetAxisRaw("Vertical");
 
         _inputVector = new Vector3(dx, 0, dz).normalized;
@@ -28,6 +29,9 @@ public class Movement : MonoBehaviour
         {
             _inputVector *= walkSpeed;
         }
+        
+        // Apply the existing y velocity (falling or jumping)
+        _inputVector.y = dy;
 
         // Flip the character if moving left or right
         if (dx != 0)
