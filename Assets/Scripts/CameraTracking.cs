@@ -12,7 +12,7 @@ public class CameraTracking : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        _offset = new Vector3(0f, 1.5f, -7f);
+        _offset = new Vector3(0f, 1f, -4f);
         _velocity = Vector3.zero;
     }
 
