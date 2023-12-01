@@ -18,6 +18,7 @@ public class Movement : MonoBehaviour
         // Shadow casting stuff (I hate Unity)
         _spriteRenderer = GetComponent<SpriteRenderer>();
         _spriteRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+        _spriteRenderer.receiveShadows = true;
     }
 
     void Update()
