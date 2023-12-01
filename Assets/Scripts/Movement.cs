@@ -6,6 +6,7 @@ public class Movement : MonoBehaviour
     [SerializeField] private float walkSpeed;
     [SerializeField] private float sprintSpeed;
     private CharacterController _characterController;
+    private SpriteRenderer _spriteRenderer;
     private Vector3 _inputVector;
     private Vector3 _velocity; // Variable to store the vertical velocity
 
@@ -13,6 +14,10 @@ public class Movement : MonoBehaviour
     {
         _characterController = GetComponent<CharacterController>();
         _velocity.y = -5f; // Some downward momentum so that the character doesn't fall too slowly in the beginning
+        
+        // Shadow casting stuff (I hate Unity)
+        _spriteRenderer = GetComponent<SpriteRenderer>();
+        _spriteRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
     }
 
     void Update()
