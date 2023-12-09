@@ -18,6 +18,9 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private BattleState state;
     [SerializeField] private GameObject playerPrefab;
     [SerializeField] private GameObject enemyPrefab;
+    
+    [SerializeField] private GameObject attackPrefab;
+    private Attack _attackScript;
 
     private Unit _playerUnit;
     private Unit _enemyUnit;
@@ -69,14 +72,62 @@ public class BattleManager : MonoBehaviour
         PlayerTurn();
     }
 
-    void SetHP(Unit unit, Slider hpSlider, TextMeshProUGUI hpText, int hp)
+    IEnumerator PlayerAttack()
     {
-        hpSlider.value = hp;
-        hpText.text = unit.currentHP + " / " + unit.maxHP;
+        // todo OnFightButtonPressed();
+        // bool isDead = // todo: take damage with EndAttack()
+        // SetHP(_enemyUnit, enemyHPSlider, enemyHPStatus, damage);
+
+        int damage = EndAttack();
+        bool isDead = _enemyUnit.currentHP - damage <= 0;
+        dialogueText.text = _enemyUnit.name + " took " + damage + " damage!";
+        yield return new WaitForSeconds(2f);
+
+        if (isDead)
+        {
+            dialogueText.text = _enemyUnit.unitName + " was defeated!";
+            yield return new WaitForSeconds(3f);
+            state = BattleState.WON;
+        }
+        else
+        {
+            // todo: enemy turn
+        }
+    }
+    
+    void Damage(Unit unit, Slider hpSlider, TextMeshProUGUI hpText, int damage)
+    {
+        if (damage <= unit.currentHP)
+        {
+            hpSlider.value = unit.currentHP - damage;
+        }
+        else
+        {
+            hpSlider.value = 0;
+            damage = unit.currentHP;
+        }
+        hpText.text = (unit.currentHP - damage) + " / " + unit.maxHP;
+        unit.currentHP -= damage;
     }
 
     void PlayerTurn()
     {
         dialogueText.text = "What will " + _playerUnit.unitName + " do?";
+    }
+
+    public void OnFightButtonPressed()
+    {
+        buttonsPanel.SetActive(false);
+        GameObject attack = Instantiate(attackPrefab);
+        _attackScript = attack.GetComponent<Attack>();
+    }
+
+    public int EndAttack()
+    {
+        int damage = _attackScript.CalculateDamage();
+        _enemyUnit.TakeDamage(damage);
+        Destroy(_attackScript.gameObject);
+        buttonsPanel.SetActive(true);
+        return damage;
     }
 }
