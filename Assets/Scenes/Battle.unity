@@ -509,7 +509,7 @@ MonoBehaviour:
   enemyHPStatus: {fileID: 219876143}
   playerHPSlider: {fileID: 44903935}
   enemyHPSlider: {fileID: 943370262}
-  buttonsCanvas: {fileID: 0}
+  buttonsPanel: {fileID: 778369937}
 --- !u!4 &121760045
 Transform:
   m_ObjectHideFlags: 0
