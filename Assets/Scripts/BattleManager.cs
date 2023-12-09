@@ -4,15 +4,19 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public enum BattleState{ START, PLAYERTURN, ENEMYTURN, WON, LOST }
+public enum BattleState
+{
+    START,
+    PLAYERTURN,
+    ENEMYTURN,
+    WON,
+    LOST
+}
 
 public class BattleManager : MonoBehaviour
 {
-
     [SerializeField] private BattleState state;
-
     [SerializeField] private GameObject playerPrefab;
-
     [SerializeField] private GameObject enemyPrefab;
 
     private Unit _playerUnit;
@@ -27,9 +31,8 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI enemyHPStatus;
     [SerializeField] private Slider playerHPSlider;
     [SerializeField] private Slider enemyHPSlider;
-
     [SerializeField] private GameObject buttonsPanel;
-    
+
     // Start is called before the first frame update
     void Start()
     {
@@ -47,7 +50,7 @@ public class BattleManager : MonoBehaviour
         playerHPSlider.maxValue = _playerUnit.maxHP;
         playerHPSlider.value = _playerUnit.currentHP;
         playerHPStatus.text = _playerUnit.currentHP + " / " + _playerUnit.maxHP;
-        
+
         GameObject enemyGameObject = Instantiate(enemyPrefab);
         _enemyUnit = enemyGameObject.GetComponent<Unit>();
         enemyNameText.text = _enemyUnit.unitName;
