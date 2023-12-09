@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,7 +18,11 @@ public class BattleManager : MonoBehaviour
     private Unit _playerUnit;
     private Unit _enemyUnit;
 
-    public Text dialogueText;
+    [SerializeField] private TextMeshProUGUI dialogueText;
+    [SerializeField] private TextMeshProUGUI playerNameText;
+    [SerializeField] private TextMeshProUGUI enemyNameText;
+    [SerializeField] private TextMeshProUGUI playerLevelText;
+    [SerializeField] private TextMeshProUGUI enemyLevelText;
     
     // Start is called before the first frame update
     void Start()
@@ -30,10 +35,14 @@ public class BattleManager : MonoBehaviour
     {
         GameObject playerGameObject = Instantiate(playerPrefab);
         _playerUnit = playerGameObject.GetComponent<Unit>();
+        playerNameText.text = _playerUnit.unitName;
+        playerLevelText.text = "Level " + _playerUnit.unitLevel;
         
         GameObject enemyGameObject = Instantiate(enemyPrefab);
         _enemyUnit = enemyGameObject.GetComponent<Unit>();
+        enemyNameText.text = _enemyUnit.unitName;
+        enemyLevelText.text = "Level " + _enemyUnit.unitLevel;
 
-        dialogueText.text = "An enemy " + _enemyUnit.unitName + "\nchallenges " + _playerUnit.unitName + " to battle!";
+        dialogueText.text = "An enemy " + _enemyUnit.unitName + " challenges " + _playerUnit.unitName + " to battle!";
     }
 }
