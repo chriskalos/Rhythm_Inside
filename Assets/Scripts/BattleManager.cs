@@ -88,13 +88,19 @@ public class BattleManager : MonoBehaviour
             dialogueText.text = _enemyUnit.unitName + " was defeated!";
             yield return new WaitForSeconds(3f);
             state = BattleState.WON;
+            EndBattle();
         }
         else
         {
-            // todo: enemy turn
+            state = BattleState.ENEMYTURN;
+            // todo: StartCoroutine(EnemyTurn());
         }
     }
-    
+
+    void EndBattle()
+    {
+        
+    }
     void Damage(Unit unit, Slider hpSlider, TextMeshProUGUI hpText, int damage)
     {
         if (damage <= unit.currentHP)
@@ -119,6 +125,7 @@ public class BattleManager : MonoBehaviour
     {
         buttonsPanel.SetActive(false);
         GameObject attack = Instantiate(attackPrefab);
+        Damage(_enemyUnit, enemyHPSlider, enemyHPStatus, _attackScript.CalculateDamage());
         _attackScript = attack.GetComponent<Attack>();
     }
 

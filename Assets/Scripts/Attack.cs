@@ -18,7 +18,7 @@ public class Attack : MonoBehaviour
 
     IEnumerator SpawnPellets()
     {
-        while (true) // You'll want to replace this with a condition to stop spawning when the rhythm section ends
+        while (true) // I only want this to spawn a maximum of 8 pellets
         {
             SpawnPellet();
             yield return new WaitForSeconds(beatInterval);
@@ -39,7 +39,7 @@ public class Attack : MonoBehaviour
             // todo
             // Check for pellets in the hit area
             // Calculate hit or miss
-            // You might want to use Physics2D.OverlapCircle here to detect pellets
+            // You might want to use Physics.OverlapCircle here to detect pellets
         }
     }
 
