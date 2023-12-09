@@ -32,23 +32,23 @@ public class Movement : MonoBehaviour
         _inputVector = new Vector3(dx, 0, dz).normalized;
         
         // Determine movement state to set animation
-        bool isMoving = _inputVector.magnitude > 0;
+        bool isMoving = _inputVector.sqrMagnitude > 0;
         Debug.Log(isMoving);
         Debug.Log(_inputVector.magnitude);
-        bool isSprinting = isMoving && Input.GetKey(KeyCode.LeftShift);
         
-        _animator.SetBool("IsWalking", isMoving && !isSprinting);
-        _animator.SetBool("IsSprinting", isSprinting);
+        _animator.SetBool("IsWalking", isMoving);
 
         // Check if sprinting
         float currentSpeed;
         if (Input.GetKey(KeyCode.LeftShift))
         {
             currentSpeed = sprintSpeed;
+            _animator.SetFloat("AnimationSpeed", 1.5f);
         }
         else
         {
             currentSpeed = walkSpeed;
+            _animator.SetFloat("AnimationSpeed", 1.0f);
         }
         Vector3 moveDirection = _inputVector * currentSpeed;
         
