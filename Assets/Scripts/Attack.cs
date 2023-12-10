@@ -1,27 +1,35 @@
 using UnityEngine;
 using System.Collections;
+using Unity.VisualScripting;
 
 public class Attack : MonoBehaviour
 {
+    [SerializeField] private float bpm = 125f; // Beats per minute
     [SerializeField] private GameObject pelletPrefab;
     [SerializeField] private Transform spawnPoint;
     [SerializeField] private Transform hitArea;
     [SerializeField] private float pelletSpeed = 10f;
     [SerializeField] private float beatInterval; // Time between beats, calculated from BPM
 
+    private bool _hasMissed;
     private void Start()
     {
         // Calculate interval between beats (60 seconds divided by BPM)
-        beatInterval = 60f / 125f; // For 125 BPM
+        beatInterval = 60f / bpm; // 60 seconds divided by BPM
         StartCoroutine(SpawnPellets());
     }
 
     IEnumerator SpawnPellets()
     {
-        while (true) // I only want this to spawn a maximum of 8 pellets
+        // I actually want it to spawn up to 8 pellets
+        for (int i = 0; i < 8; i++)
         {
-            SpawnPellet();
-            yield return new WaitForSeconds(beatInterval);
+            // If the player misses a pellet, the loop will break
+            while (!_hasMissed)
+            {
+                SpawnPellet();
+                yield return new WaitForSeconds(beatInterval);
+            }
         }
     }
 
