@@ -99,7 +99,8 @@ public class BattleManager : MonoBehaviour
 
     void EndBattle()
     {
-        
+        // todo: end battle
+        // Take stats from battle and pass them to GameManager
     }
     void Damage(Unit unit, Slider hpSlider, TextMeshProUGUI hpText, int damage)
     {
