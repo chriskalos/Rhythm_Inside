@@ -1,33 +1,36 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PelletScroller : MonoBehaviour
 {
-    [SerializeField] private float bpm = 125f; // Beats per minute
-    [SerializeField] private float pelletSpeed = 30f;
-    [SerializeField] private bool hasStarted;
-    private float _bpmTransform;
+    [SerializeField] private GameObject pelletPrefab;
     
     // Start is called before the first frame update
     void Start()
     {
-        _bpmTransform = bpm / pelletSpeed;
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!hasStarted)
+        
+    }
+
+    public void SpawnPellet()
+    {
+        GameObject instance = Instantiate(pelletPrefab, new Vector3(600f, 0f, -10f), Quaternion.identity);
+        
+        instance.transform.SetParent(this.transform, false);
+    }
+
+    public void MoveToTheBeat()
+    {
+        foreach (BeatPellet pellet in GetComponentsInChildren<BeatPellet>())
         {
-            if (Input.anyKeyDown)
-            {
-                hasStarted = true;
-            }
-        }
-        else
-        {
-            transform.position -= new Vector3(_bpmTransform * Time.deltaTime, 0f, 0f);
+            pellet.transform.localPosition += new Vector3(-5f, 0f, 0f);
         }
     }
 }
