@@ -5,22 +5,24 @@ using UnityEngine;
 public class BeatPellet : MonoBehaviour
 {
     [SerializeField] private bool canBePressed;
-    [SerializeField] private KeyCode keyToPress;
+    public KeyCode keyToPress;
+    
+    private PelletScroller _pelletScroller;
     
     // Start is called before the first frame update
     void Start()
     {
+        _pelletScroller = GetComponentInParent<PelletScroller>();
         // todo: import BattleManager
     }
 
     // Update is called once per frame
     void Update()
     {
-        if ((Input.GetKeyDown(keyToPress) || Input.GetKeyDown(KeyCode.Space)) && canBePressed)
+        if (Input.GetKeyDown(keyToPress) && canBePressed)
         {
-            gameObject.SetActive(false);
-            // Debug.Log("Hit!");
-            // todo: BattleManager to keep score
+            _pelletScroller.HitPellet();
+            Destroy(gameObject);
         }
     }
 
@@ -36,6 +38,7 @@ public class BeatPellet : MonoBehaviour
         if (other.tag == "Activator")
         {
             canBePressed = false;
+            _pelletScroller.battleManager.EndAttack();
         }
     }
 }

@@ -18,9 +18,8 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private BattleState state;
     [SerializeField] private GameObject playerPrefab;
     [SerializeField] private GameObject enemyPrefab;
-    
-    [SerializeField] private GameObject attackPrefab;
-    private Attack _attackScript;
+
+    [SerializeField] private GameObject rhythmAttackPanel;
 
     private Unit _playerUnit;
     private Unit _enemyUnit;
@@ -72,31 +71,6 @@ public class BattleManager : MonoBehaviour
         PlayerTurn();
     }
 
-    IEnumerator PlayerAttack()
-    {
-        // todo OnFightButtonPressed();
-        // bool isDead = // todo: take damage with EndAttack()
-        // SetHP(_enemyUnit, enemyHPSlider, enemyHPStatus, damage);
-
-        int damage = EndAttack();
-        bool isDead = _enemyUnit.currentHP - damage <= 0;
-        dialogueText.text = _enemyUnit.name + " took " + damage + " damage!";
-        yield return new WaitForSeconds(2f);
-
-        if (isDead)
-        {
-            dialogueText.text = _enemyUnit.unitName + " was defeated!";
-            yield return new WaitForSeconds(3f);
-            state = BattleState.WON;
-            EndBattle();
-        }
-        else
-        {
-            state = BattleState.ENEMYTURN;
-            // todo: StartCoroutine(EnemyTurn());
-        }
-    }
-
     void EndBattle()
     {
         // todo: end battle
@@ -124,18 +98,13 @@ public class BattleManager : MonoBehaviour
 
     public void OnFightButtonPressed()
     {
+        dialogueText.text = "Press the spacebar to the beat to attack!";
         buttonsPanel.SetActive(false);
-        GameObject attack = Instantiate(attackPrefab);
-        Damage(_enemyUnit, enemyHPSlider, enemyHPStatus, _attackScript.CalculateDamage());
-        _attackScript = attack.GetComponent<Attack>();
+        rhythmAttackPanel.SetActive(true);
     }
 
-    public int EndAttack()
+    public void EndAttack()
     {
-        int damage = _attackScript.CalculateDamage();
-        _enemyUnit.TakeDamage(damage);
-        Destroy(_attackScript.gameObject);
-        buttonsPanel.SetActive(true);
-        return damage;
+        
     }
 }
