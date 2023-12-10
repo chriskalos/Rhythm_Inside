@@ -20,6 +20,8 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private GameObject enemyPrefab;
 
     [SerializeField] private GameObject rhythmAttackPanel;
+    [SerializeField] private GameObject pelletHolder;
+    private PelletScroller _pelletScroller;
 
     private Unit _playerUnit;
     private Unit _enemyUnit;
@@ -38,6 +40,7 @@ public class BattleManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        _pelletScroller = pelletHolder.GetComponent<PelletScroller>();
         buttonsPanel.SetActive(false);
         state = BattleState.START;
         StartCoroutine(StartBattle());
@@ -105,6 +108,12 @@ public class BattleManager : MonoBehaviour
 
     public void EndAttack()
     {
-        
+        int _damageDealt = _pelletScroller.damage;
+        Damage(_enemyUnit, enemyHPSlider, enemyHPStatus, _damageDealt);
+        dialogueText.text = _playerUnit.unitName + " dealt " + _damageDealt + " damage to " + _enemyUnit.unitName + "!";
+        rhythmAttackPanel.SetActive(false);
+        _pelletScroller.damage = 0;
+        _pelletScroller.pelletCount = 0;
+        state = BattleState.ENEMYTURN;
     }
 }

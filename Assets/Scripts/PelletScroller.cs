@@ -9,8 +9,8 @@ public class PelletScroller : MonoBehaviour
     [SerializeField] private GameObject rhythmAttackPanel;
     [SerializeField] private GameObject pelletPrefab;
 
-    private int damage { get; set; }
-    private int pelletCount { get; set; }
+    public int damage;
+    public int pelletCount;
 
     private int _spawnedPellets;
     
