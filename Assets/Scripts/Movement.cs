@@ -33,8 +33,8 @@ public class Movement : MonoBehaviour
         
         // Determine movement state to set animation
         bool isMoving = _inputVector.sqrMagnitude > 0;
-        Debug.Log(isMoving);
-        Debug.Log(_inputVector.magnitude);
+        // Debug.Log(isMoving);
+        // Debug.Log(_inputVector.magnitude);
         
         _animator.SetBool("IsWalking", isMoving);
 
