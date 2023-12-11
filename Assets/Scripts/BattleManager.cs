@@ -23,8 +23,8 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private GameObject rhythmAttackPanel;
     [SerializeField] private GameObject pelletHolder;
     private PelletScroller _pelletScroller;
-
-    // These are public because they are accessed by the PelletScroller as well
+    
+    // These are public because they are accessed by the PelletScroller
     public Unit playerUnit;
     public Unit enemyUnit;
 
@@ -84,11 +84,13 @@ public class BattleManager : MonoBehaviour
         if (state == BattleState.WON)
         {
             dialogueText.text = playerUnit.unitName + " won the battle!";
-            // wait 3 seconds
+            // todo: give player exp
+            // todo: return to overworld
         }
         else if (state == BattleState.LOST)
         {
             dialogueText.text = playerUnit.unitName + " was defeated.";
+            // todo: game over
         }
     }
     void Damage(Unit unit, Slider hpSlider, TextMeshProUGUI hpText, int damage)

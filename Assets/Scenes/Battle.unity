@@ -507,10 +507,10 @@ MonoBehaviour:
   enemyNameText: {fileID: 1440813863}
   playerLevelText: {fileID: 1692840344}
   enemyLevelText: {fileID: 16130679}
-  playerHPStatus: {fileID: 485776833}
-  enemyHPStatus: {fileID: 219876143}
-  playerHPSlider: {fileID: 44903935}
-  enemyHPSlider: {fileID: 943370262}
+  playerHpStatus: {fileID: 485776833}
+  enemyHpStatus: {fileID: 219876143}
+  playerHpSlider: {fileID: 44903935}
+  enemyHpSlider: {fileID: 943370262}
   buttonsPanel: {fileID: 778369937}
 --- !u!4 &121760045
 Transform:
