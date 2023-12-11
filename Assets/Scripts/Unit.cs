@@ -9,6 +9,8 @@ public class Unit : MonoBehaviour
 
     public int unitLevel;
 
+    public int unitMaxLevel = 100;
+
     public int baseHP = 30;
     
     public int maxHP;
@@ -34,7 +36,6 @@ public class Unit : MonoBehaviour
     // Awake is called before Start
     void Awake()
     {
-        givenXP = Mathf.RoundToInt(baseXP * Mathf.Pow(xpGrowthRate, unitLevel - 1)); // 20% increase per level
         UpdateStats();
         currentHP = maxHP;
     }
@@ -50,14 +51,18 @@ public class Unit : MonoBehaviour
     public void UpdateStats()
     {
         maxHP = Mathf.RoundToInt(baseHP * Mathf.Pow(hpGrowthRate, unitLevel - 1)); // 15% increase per level
+        givenXP = Mathf.RoundToInt(baseXP * Mathf.Pow(xpGrowthRate, unitLevel - 1)); // 20% increase per level
     }
     
     public void GainXP(int amount)
     {
-        xp += amount;
-        while (xp >= XPForNextLevel(unitLevel))
+        if (unitLevel < unitMaxLevel)
         {
-            LevelUp();
+            xp += amount;
+            if (xp >= XPForNextLevel(unitLevel))
+            {
+                LevelUp();
+            }
         }
     }
     
@@ -71,8 +76,13 @@ public class Unit : MonoBehaviour
     
     private int XPForNextLevel(int level)
     {
-        // Calculate the XP required for the next level
-        return Mathf.RoundToInt(baseXP * Mathf.Pow(xpGrowthRate, level - 1));
+        if (unitLevel < unitMaxLevel)
+        {
+            // Calculate the XP required for the next level
+            return Mathf.RoundToInt(baseXP * Mathf.Pow(xpGrowthRate, level - 1));
+        }
+
+        return 0;
     }
     
     public void ResetHP()

@@ -63,9 +63,14 @@ public class BattleManager : MonoBehaviour
         GameObject enemyGameObject = Instantiate(enemyPrefab);
         enemyUnit = enemyGameObject.GetComponent<Unit>();
         
-        // todo: generate enemy unit based on player level
-        enemyUnit.unitLevel = 4;
+        // Randomize enemy level based on player level
+        int enemyLevel = playerUnit.unitLevel + Random.Range(2, 6); // Enemy level is 2-5 levels higher than player level
+        enemyLevel = Mathf.Clamp(enemyLevel, 1, enemyUnit.unitMaxLevel); // Ensure enemy level doesn't go below 1 or above a maximum level
         
+        enemyUnit.unitLevel = enemyLevel;
+        
+        enemyUnit.UpdateStats();
+        enemyUnit.currentHP = enemyUnit.maxHP;
         UpdateStats();
 
         dialogueText.text = "An enemy " + enemyUnit.unitName + " challenges " + playerUnit.unitName + " to battle!";
