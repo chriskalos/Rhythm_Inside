@@ -52,6 +52,12 @@ public class BattleManager : MonoBehaviour
     {
         GameObject playerGameObject = Instantiate(playerPrefab);
         playerUnit = playerGameObject.GetComponent<Unit>();
+
+        playerUnit.unitLevel = GameManager.Instance.playerLevel;
+        playerUnit.xp = GameManager.Instance.playerXP;
+        playerUnit.currentHP = GameManager.Instance.playerCurrentHP;
+        playerUnit.UpdateStats();
+        
         playerNameText.text = playerUnit.unitName;
         playerLevelText.text = "Level " + playerUnit.unitLevel;
         playerHpSlider.maxValue = playerUnit.maxHP;
@@ -60,8 +66,11 @@ public class BattleManager : MonoBehaviour
 
         GameObject enemyGameObject = Instantiate(enemyPrefab);
         enemyUnit = enemyGameObject.GetComponent<Unit>();
-        enemyUnit.unitLevel = 15;
+        
+        // todo: generate enemy unit based on player level
+        enemyUnit.unitLevel = 2;
         enemyUnit.UpdateStats();
+        
         enemyNameText.text = enemyUnit.unitName;
         enemyLevelText.text = "Level " + enemyUnit.unitLevel;
         enemyHpSlider.maxValue = enemyUnit.maxHP;
@@ -85,9 +94,18 @@ public class BattleManager : MonoBehaviour
         
         if (state == BattleState.WON)
         {
-            dialogueText.text = playerUnit.unitName + " won the battle!";
-            // todo: give player exp
             // todo: return to overworld
+            
+            int previousLevel = playerUnit.unitLevel;
+            
+            playerUnit.GainXP(enemyUnit.givenXP);
+            if (playerUnit.unitLevel > previousLevel)
+            {
+                StartCoroutine(WaitForMessage(playerUnit.unitLevel + " has leveled up!"));
+            }
+            StartCoroutine(WaitForMessage(playerUnit.unitName + " won the battle!"));
+            GameManager.Instance.UpdatePlayerState(playerUnit.unitLevel, playerUnit.xp, playerUnit.currentHP);
+            GameManager.Instance.EndBattle();
         }
         else if (state == BattleState.LOST)
         {
@@ -95,6 +113,18 @@ public class BattleManager : MonoBehaviour
             // todo: game over
         }
     }
+    
+    IEnumerator DisplayMessage(string message)
+    {
+        dialogueText.text = message;
+        yield return new WaitForSeconds(3f);
+    }
+    
+    IEnumerator WaitForMessage(string message)
+    {
+        yield return StartCoroutine(DisplayMessage(message));
+    }
+    
     void Damage(Unit unit, Slider hpSlider, TextMeshProUGUI hpText, int damage)
     {
         if (damage <= unit.currentHP)

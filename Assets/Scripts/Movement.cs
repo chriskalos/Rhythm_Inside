@@ -1,3 +1,4 @@
+using System;
 using System.Net.NetworkInformation;
 using UnityEngine;
 
@@ -10,6 +11,7 @@ public class Movement : MonoBehaviour
     private SpriteRenderer _spriteRenderer;
     private Vector3 _inputVector;
     private Vector3 _velocity; // Variable to store the vertical velocity
+    private bool _battleStarted = false;
 
     void Start()
     {
@@ -75,6 +77,15 @@ public class Movement : MonoBehaviour
             var localScale = transform.localScale;
             localScale = new Vector3(Mathf.Sign(dx), localScale.y, localScale.z);
             transform.localScale = localScale;
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "Enemy" && !_battleStarted)
+        {
+            _battleStarted = true;
+            GameManager.Instance.StartBattle();
         }
     }
 }
