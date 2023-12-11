@@ -36,6 +36,7 @@ public class Unit : MonoBehaviour
     {
         givenXP = Mathf.RoundToInt(baseXP * Mathf.Pow(xpGrowthRate, unitLevel - 1)); // 20% increase per level
         UpdateStats();
+        currentHP = maxHP;
     }
 
     void Start()
@@ -49,7 +50,6 @@ public class Unit : MonoBehaviour
     public void UpdateStats()
     {
         maxHP = Mathf.RoundToInt(baseHP * Mathf.Pow(hpGrowthRate, unitLevel - 1)); // 15% increase per level
-        currentHP = maxHP;
     }
     
     public void GainXP(int amount)
@@ -66,6 +66,7 @@ public class Unit : MonoBehaviour
         unitLevel++;
         xp -= XPForNextLevel(unitLevel - 1); // Subtract XP required for the level-up
         UpdateStats(); // Update stats based on new level
+        currentHP = maxHP; // Fully heal the unit
     }
     
     private int XPForNextLevel(int level)

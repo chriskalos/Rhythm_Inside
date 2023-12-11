@@ -429,7 +429,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 57180736}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 121760044}
+        m_TargetAssemblyTypeName: BattleManager, Assembly-CSharp
+        m_MethodName: OnCheckButtonPressed
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &57180736
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -497,7 +509,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa0d1309aac91e1429329636e3504649, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameManager: {fileID: 325783600}
   state: 0
   playerPrefab: {fileID: 7547889785798866761, guid: ecf45f523c3651748bdddc8927036aeb, type: 3}
   enemyPrefab: {fileID: 4839001950817517889, guid: 9fac2cc950b272240bd14975f7af90ef, type: 3}

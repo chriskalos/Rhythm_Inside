@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
@@ -39,6 +40,8 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private Slider enemyHpSlider;
     [SerializeField] private GameObject buttonsPanel;
 
+    private float _fleeChance;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -56,34 +59,43 @@ public class BattleManager : MonoBehaviour
         playerUnit.unitLevel = GameManager.Instance.playerLevel;
         playerUnit.xp = GameManager.Instance.playerXP;
         playerUnit.currentHP = GameManager.Instance.playerCurrentHP;
-        playerUnit.UpdateStats();
-        
-        playerNameText.text = playerUnit.unitName;
-        playerLevelText.text = "Level " + playerUnit.unitLevel;
-        playerHpSlider.maxValue = playerUnit.maxHP;
-        playerHpSlider.value = playerUnit.currentHP;
-        playerHpStatus.text = playerUnit.currentHP + " / " + playerUnit.maxHP;
 
         GameObject enemyGameObject = Instantiate(enemyPrefab);
         enemyUnit = enemyGameObject.GetComponent<Unit>();
         
         // todo: generate enemy unit based on player level
-        enemyUnit.unitLevel = 2;
-        enemyUnit.UpdateStats();
+        enemyUnit.unitLevel = 4;
         
+        UpdateStats();
+
+        dialogueText.text = "An enemy " + enemyUnit.unitName + " challenges " + playerUnit.unitName + " to battle!";
+        
+        _fleeChance = Mathf.Clamp(0.5f + 0.05f * (playerUnit.unitLevel - enemyUnit.unitLevel), 0, 1);
+
+        yield return new WaitForSeconds(3f);
+        
+        state = BattleState.PLAYERTURN;
+        PlayerTurn();
+    }
+
+    private void UpdateStats()
+    {
+        // Update player stats & UI
+        playerUnit.UpdateStats();
+        playerNameText.text = playerUnit.unitName;
+        playerLevelText.text = "Level " + playerUnit.unitLevel;
+        playerHpSlider.maxValue = playerUnit.maxHP;
+        playerHpSlider.value = playerUnit.currentHP;
+        playerHpStatus.text = playerUnit.currentHP + " / " + playerUnit.maxHP;
+        
+        // Update enemy stats & UI
+        enemyUnit.UpdateStats();
         enemyNameText.text = enemyUnit.unitName;
         enemyLevelText.text = "Level " + enemyUnit.unitLevel;
         enemyHpSlider.maxValue = enemyUnit.maxHP;
         enemyHpSlider.value = enemyUnit.currentHP;
         enemyHpSlider.value = enemyUnit.currentHP;
         enemyHpStatus.text = enemyUnit.currentHP + " / " + enemyUnit.maxHP;
-
-        dialogueText.text = "An enemy " + enemyUnit.unitName + " challenges " + playerUnit.unitName + " to battle!";
-
-        yield return new WaitForSeconds(3f);
-        
-        state = BattleState.PLAYERTURN;
-        PlayerTurn();
     }
 
     void EndBattle(BattleState state)
@@ -110,6 +122,7 @@ public class BattleManager : MonoBehaviour
     
     IEnumerator HandleEndOfBattle(bool leveledUp)
     {
+        UpdateStats();
         yield return StartCoroutine(WaitForMessage(playerUnit.unitName + " gained " + enemyUnit.givenXP + " XP."));
         if (leveledUp)
         {
@@ -154,6 +167,13 @@ public class BattleManager : MonoBehaviour
         dialogueText.text = "Press the spacebar on the beat to attack!";
         buttonsPanel.SetActive(false);
         rhythmAttackPanel.SetActive(true);
+    }
+
+    public void OnCheckButtonPressed()
+    {
+        string message = "The enemy can deal damage between " + enemyUnit.unitLevel + " and " + 4 * enemyUnit.unitLevel + ".\n";
+        message += "Your chance of fleeing is " + (_fleeChance * 100) + "%.";
+        StartCoroutine(WaitForMessage(message));
     }
     
     public void EndAttack()
