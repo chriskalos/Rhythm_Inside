@@ -54,9 +54,20 @@ public class PelletScroller : MonoBehaviour
         pelletCount++;
         damage += pelletCount;
 
-        if (pelletCount == 8)
+        if (pelletCount >= 8)
         {
-            battleManager.EndAttack();
+            EndAttack();
         }
+    }
+    
+    public void EndAttack()
+    {
+        // StartCoroutine(battleManager.EndAttack());
+        battleManager.EndAttack();
+        foreach (BeatPellet pellet in GetComponentsInChildren<BeatPellet>())
+        {
+            Destroy(pellet.gameObject);
+        }
+        _spawnedPellets = 0;
     }
 }

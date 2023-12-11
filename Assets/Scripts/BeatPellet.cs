@@ -38,7 +38,7 @@ public class BeatPellet : MonoBehaviour
         if (other.tag == "Activator")
         {
             canBePressed = false;
-            _pelletScroller.battleManager.EndAttack();
+            _pelletScroller.EndAttack();
         }
     }
 }

@@ -68,16 +68,26 @@ public class BattleManager : MonoBehaviour
         dialogueText.text = "An enemy " + _enemyUnit.unitName + " challenges " + _playerUnit.unitName + " to battle!";
 
         yield return new WaitForSeconds(3f);
-
-        buttonsPanel.SetActive(true);
+        
         state = BattleState.PLAYERTURN;
         PlayerTurn();
     }
 
-    void EndBattle()
+    void EndBattle(BattleState state)
     {
         // todo: end battle
-        // Take stats from battle and pass them to GameManager
+        // todo: if player wins, give player exp, return to overworld
+        // todo: if player loses, game over
+        
+        if (state == BattleState.WON)
+        {
+            dialogueText.text = _playerUnit.unitName + " won the battle!";
+            // wait 3 seconds
+        }
+        else if (state == BattleState.LOST)
+        {
+            dialogueText.text = _playerUnit.unitName + " was defeated.";
+        }
     }
     void Damage(Unit unit, Slider hpSlider, TextMeshProUGUI hpText, int damage)
     {
@@ -94,26 +104,89 @@ public class BattleManager : MonoBehaviour
         unit.currentHP -= damage;
     }
 
-    void PlayerTurn()
-    {
-        dialogueText.text = "What will " + _playerUnit.unitName + " do?";
-    }
-
     public void OnFightButtonPressed()
     {
-        dialogueText.text = "Press the spacebar to the beat to attack!";
+        dialogueText.text = "Press the spacebar on the beat to attack!";
         buttonsPanel.SetActive(false);
         rhythmAttackPanel.SetActive(true);
     }
-
+    
     public void EndAttack()
     {
-        int _damageDealt = _pelletScroller.damage;
-        Damage(_enemyUnit, enemyHPSlider, enemyHPStatus, _damageDealt);
-        dialogueText.text = _playerUnit.unitName + " dealt " + _damageDealt + " damage to " + _enemyUnit.unitName + "!";
+        int damageDealt = _pelletScroller.damage;
+        Damage(_enemyUnit, enemyHPSlider, enemyHPStatus, damageDealt);
         rhythmAttackPanel.SetActive(false);
         _pelletScroller.damage = 0;
         _pelletScroller.pelletCount = 0;
+        StartCoroutine(EndPlayerTurn(damageDealt));
+    }
+    
+    IEnumerator EndPlayerTurn(int damageDealt)
+    {
+        yield return StartCoroutine(DisplayDamageDialogue(damageDealt, _playerUnit, _enemyUnit));
         state = BattleState.ENEMYTURN;
+        EnemyTurn();
+    }
+    
+    IEnumerator DisplayDamageDialogue(int damageDealt, Unit damageDealer, Unit damageReceiver)
+    {
+        dialogueText.text = damageDealer.unitName + " dealt " + damageDealt + " damage to " + damageReceiver.unitName + "!";
+        yield return new WaitForSeconds(3f);
+    }
+    
+    void PlayerTurn()
+    {
+        if (_playerUnit.currentHP <= 0)
+        {
+            state = BattleState.LOST;
+            EndBattle(state);
+        }
+        else if (_enemyUnit.currentHP <= 0)
+        {
+            state = BattleState.WON;
+            EndBattle(state);
+        }
+        else
+        {
+            buttonsPanel.SetActive(true);
+            dialogueText.text = "What will " + _playerUnit.unitName + " do?";
+        }
+    }
+    
+    void EnemyTurn()
+    {
+        if (_playerUnit.currentHP <= 0)
+        {
+            state = BattleState.LOST;
+            EndBattle(state);
+        }
+        else if (_enemyUnit.currentHP <= 0)
+        {
+            Debug.Log(state);
+            state = BattleState.WON;
+            Debug.Log(state);
+            Debug.Log("Calling EndBattle(state);");
+            EndBattle(state);
+        }
+        else
+        {
+            EnemyAttack();
+        }
+    }
+    
+    void EnemyAttack()
+    {
+        // Scale attack damage with the level of the enemy realistically
+        int damageDealt = Random.Range(1, 4) * _enemyUnit.unitLevel;
+        
+        Damage(_playerUnit, playerHPSlider, playerHPStatus, damageDealt);
+        StartCoroutine(EndEnemyTurn(damageDealt));
+    }
+    
+    IEnumerator EndEnemyTurn(int damageDealt)
+    {
+        yield return StartCoroutine(DisplayDamageDialogue(damageDealt, _enemyUnit, _playerUnit));
+        state = BattleState.PLAYERTURN;
+        PlayerTurn();
     }
 }
