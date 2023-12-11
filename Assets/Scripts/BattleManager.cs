@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public enum BattleState
@@ -23,18 +24,19 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private GameObject pelletHolder;
     private PelletScroller _pelletScroller;
 
-    private Unit _playerUnit;
-    private Unit _enemyUnit;
+    // These are public because they are accessed by the PelletScroller as well
+    public Unit playerUnit;
+    public Unit enemyUnit;
 
     [SerializeField] private TextMeshProUGUI dialogueText;
     [SerializeField] private TextMeshProUGUI playerNameText;
     [SerializeField] private TextMeshProUGUI enemyNameText;
     [SerializeField] private TextMeshProUGUI playerLevelText;
     [SerializeField] private TextMeshProUGUI enemyLevelText;
-    [SerializeField] private TextMeshProUGUI playerHPStatus;
-    [SerializeField] private TextMeshProUGUI enemyHPStatus;
-    [SerializeField] private Slider playerHPSlider;
-    [SerializeField] private Slider enemyHPSlider;
+    [SerializeField] private TextMeshProUGUI playerHpStatus;
+    [SerializeField] private TextMeshProUGUI enemyHpStatus;
+    [SerializeField] private Slider playerHpSlider;
+    [SerializeField] private Slider enemyHpSlider;
     [SerializeField] private GameObject buttonsPanel;
 
     // Start is called before the first frame update
@@ -49,23 +51,23 @@ public class BattleManager : MonoBehaviour
     IEnumerator StartBattle()
     {
         GameObject playerGameObject = Instantiate(playerPrefab);
-        _playerUnit = playerGameObject.GetComponent<Unit>();
-        playerNameText.text = _playerUnit.unitName;
-        playerLevelText.text = "Level " + _playerUnit.unitLevel;
-        playerHPSlider.maxValue = _playerUnit.maxHP;
-        playerHPSlider.value = _playerUnit.currentHP;
-        playerHPStatus.text = _playerUnit.currentHP + " / " + _playerUnit.maxHP;
+        playerUnit = playerGameObject.GetComponent<Unit>();
+        playerNameText.text = playerUnit.unitName;
+        playerLevelText.text = "Level " + playerUnit.unitLevel;
+        playerHpSlider.maxValue = playerUnit.maxHP;
+        playerHpSlider.value = playerUnit.currentHP;
+        playerHpStatus.text = playerUnit.currentHP + " / " + playerUnit.maxHP;
 
         GameObject enemyGameObject = Instantiate(enemyPrefab);
-        _enemyUnit = enemyGameObject.GetComponent<Unit>();
-        enemyNameText.text = _enemyUnit.unitName;
-        enemyLevelText.text = "Level " + _enemyUnit.unitLevel;
-        enemyHPSlider.maxValue = _enemyUnit.maxHP;
-        enemyHPSlider.value = _enemyUnit.currentHP;
-        enemyHPSlider.value = _enemyUnit.currentHP;
-        enemyHPStatus.text = _enemyUnit.currentHP + " / " + _enemyUnit.maxHP;
+        enemyUnit = enemyGameObject.GetComponent<Unit>();
+        enemyNameText.text = enemyUnit.unitName;
+        enemyLevelText.text = "Level " + enemyUnit.unitLevel;
+        enemyHpSlider.maxValue = enemyUnit.maxHP;
+        enemyHpSlider.value = enemyUnit.currentHP;
+        enemyHpSlider.value = enemyUnit.currentHP;
+        enemyHpStatus.text = enemyUnit.currentHP + " / " + enemyUnit.maxHP;
 
-        dialogueText.text = "An enemy " + _enemyUnit.unitName + " challenges " + _playerUnit.unitName + " to battle!";
+        dialogueText.text = "An enemy " + enemyUnit.unitName + " challenges " + playerUnit.unitName + " to battle!";
 
         yield return new WaitForSeconds(3f);
         
@@ -81,12 +83,12 @@ public class BattleManager : MonoBehaviour
         
         if (state == BattleState.WON)
         {
-            dialogueText.text = _playerUnit.unitName + " won the battle!";
+            dialogueText.text = playerUnit.unitName + " won the battle!";
             // wait 3 seconds
         }
         else if (state == BattleState.LOST)
         {
-            dialogueText.text = _playerUnit.unitName + " was defeated.";
+            dialogueText.text = playerUnit.unitName + " was defeated.";
         }
     }
     void Damage(Unit unit, Slider hpSlider, TextMeshProUGUI hpText, int damage)
@@ -114,7 +116,7 @@ public class BattleManager : MonoBehaviour
     public void EndAttack()
     {
         int damageDealt = _pelletScroller.damage;
-        Damage(_enemyUnit, enemyHPSlider, enemyHPStatus, damageDealt);
+        Damage(enemyUnit, enemyHpSlider, enemyHpStatus, damageDealt);
         rhythmAttackPanel.SetActive(false);
         _pelletScroller.damage = 0;
         _pelletScroller.pelletCount = 0;
@@ -123,7 +125,7 @@ public class BattleManager : MonoBehaviour
     
     IEnumerator EndPlayerTurn(int damageDealt)
     {
-        yield return StartCoroutine(DisplayDamageDialogue(damageDealt, _playerUnit, _enemyUnit));
+        yield return StartCoroutine(DisplayDamageDialogue(damageDealt, playerUnit, enemyUnit));
         state = BattleState.ENEMYTURN;
         EnemyTurn();
     }
@@ -136,12 +138,12 @@ public class BattleManager : MonoBehaviour
     
     void PlayerTurn()
     {
-        if (_playerUnit.currentHP <= 0)
+        if (playerUnit.currentHP <= 0)
         {
             state = BattleState.LOST;
             EndBattle(state);
         }
-        else if (_enemyUnit.currentHP <= 0)
+        else if (enemyUnit.currentHP <= 0)
         {
             state = BattleState.WON;
             EndBattle(state);
@@ -149,18 +151,18 @@ public class BattleManager : MonoBehaviour
         else
         {
             buttonsPanel.SetActive(true);
-            dialogueText.text = "What will " + _playerUnit.unitName + " do?";
+            dialogueText.text = "What will " + playerUnit.unitName + " do?";
         }
     }
     
     void EnemyTurn()
     {
-        if (_playerUnit.currentHP <= 0)
+        if (playerUnit.currentHP <= 0)
         {
             state = BattleState.LOST;
             EndBattle(state);
         }
-        else if (_enemyUnit.currentHP <= 0)
+        else if (enemyUnit.currentHP <= 0)
         {
             Debug.Log(state);
             state = BattleState.WON;
@@ -177,15 +179,15 @@ public class BattleManager : MonoBehaviour
     void EnemyAttack()
     {
         // Scale attack damage with the level of the enemy realistically
-        int damageDealt = Random.Range(1, 4) * _enemyUnit.unitLevel;
+        int damageDealt = Random.Range(1, 4) * enemyUnit.unitLevel;
         
-        Damage(_playerUnit, playerHPSlider, playerHPStatus, damageDealt);
+        Damage(playerUnit, playerHpSlider, playerHpStatus, damageDealt);
         StartCoroutine(EndEnemyTurn(damageDealt));
     }
     
     IEnumerator EndEnemyTurn(int damageDealt)
     {
-        yield return StartCoroutine(DisplayDamageDialogue(damageDealt, _enemyUnit, _playerUnit));
+        yield return StartCoroutine(DisplayDamageDialogue(damageDealt, enemyUnit, playerUnit));
         state = BattleState.PLAYERTURN;
         PlayerTurn();
     }

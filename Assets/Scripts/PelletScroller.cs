@@ -28,6 +28,12 @@ public class PelletScroller : MonoBehaviour
         
     }
 
+    /// <summary>
+    /// Spawns a pellet at the right edge of the screen.
+    ///
+    /// This function is called by the BeatManager
+    /// every beat.
+    /// </summary>
     public void SpawnPellet()
     {
         if (rhythmAttackPanel.activeSelf && _spawnedPellets < 8)
@@ -38,6 +44,14 @@ public class PelletScroller : MonoBehaviour
         }
     }
 
+    // This is a crude way of moving the pellets to the left smoothly.
+    // It was the only consistent way to keep them synced with the beat.
+    
+    /// <summary>
+    /// Moves all pellets to the left by 5 units.
+    /// This function is called by the BeatManager
+    /// every 128th of a beat.
+    /// </summary>
     public void MoveToTheBeat()
     {
         if (rhythmAttackPanel.activeSelf)
@@ -49,6 +63,10 @@ public class PelletScroller : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// When a pellet is hit, count it and increment damage.
+    /// If the pellet count is 8, end the attack.
+    /// </summary>
     public void HitPellet()
     {
         pelletCount++;
@@ -60,14 +78,21 @@ public class PelletScroller : MonoBehaviour
         }
     }
     
+    /// <summary>
+    /// Ends the attack and destroys all spawned pellets.
+    /// </summary>
     public void EndAttack()
     {
-        // StartCoroutine(battleManager.EndAttack());
-        battleManager.EndAttack();
+        damage *= battleManager.playerUnit.unitLevel / 2; // Scale damage by player level
+        battleManager.EndAttack(); // End the attack from the BattleManager
+        
+        // Destroy all spawned pellets
         foreach (BeatPellet pellet in GetComponentsInChildren<BeatPellet>())
         {
             Destroy(pellet.gameObject);
         }
+        
+        // Reset spawned pellet count
         _spawnedPellets = 0;
     }
 }
