@@ -45,12 +45,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a955d35d007054499b1dcd30ec5de5b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _spriteRenderer: {fileID: 0}
+  spriteRenderer: {fileID: 0}
   unitName: Bijnt
   unitLevel: 5
-  damage: 5
-  maxHP: 30
-  currentHP: 30
+  maxHP: 0
+  currentHP: 0
 --- !u!1 &5180880562651134951
 GameObject:
   m_ObjectHideFlags: 0

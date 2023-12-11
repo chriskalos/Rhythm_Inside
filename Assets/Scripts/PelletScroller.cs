@@ -64,7 +64,7 @@ public class PelletScroller : MonoBehaviour
     }
 
     /// <summary>
-    /// When a pellet is hit, count it and increment damage.
+    /// When a pellet is hit, count it and increment damage exponentially.
     /// If the pellet count is 8, end the attack.
     /// </summary>
     public void HitPellet()
@@ -80,10 +80,12 @@ public class PelletScroller : MonoBehaviour
     
     /// <summary>
     /// Ends the attack and destroys all spawned pellets.
+    /// Also calculates damage based on the player's level.
     /// </summary>
     public void EndAttack()
     {
-        damage *= battleManager.playerUnit.unitLevel / 2; // Scale damage by player level
+        damage = Mathf.RoundToInt(damage + Mathf.Log(battleManager.playerUnit.unitLevel) * 2); // Scale damage by player level
+        Debug.Log("Damage dealt by " + battleManager.playerUnit.unitName + ": " + damage);
         battleManager.EndAttack(); // End the attack from the BattleManager
         
         // Destroy all spawned pellets

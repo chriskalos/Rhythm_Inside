@@ -60,6 +60,8 @@ public class BattleManager : MonoBehaviour
 
         GameObject enemyGameObject = Instantiate(enemyPrefab);
         enemyUnit = enemyGameObject.GetComponent<Unit>();
+        enemyUnit.unitLevel = 15;
+        enemyUnit.UpdateStats();
         enemyNameText.text = enemyUnit.unitName;
         enemyLevelText.text = "Level " + enemyUnit.unitLevel;
         enemyHpSlider.maxValue = enemyUnit.maxHP;

@@ -131,7 +131,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spriteRenderer: {fileID: 0}
   unitName: Space Girl
-  unitLevel: 60
-  damage: 15
-  maxHP: 90
-  currentHP: 30
+  unitLevel: 1
+  maxHP: 0
+  currentHP: 0

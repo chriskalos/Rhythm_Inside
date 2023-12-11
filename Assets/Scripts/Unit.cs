@@ -9,35 +9,73 @@ public class Unit : MonoBehaviour
 
     public int unitLevel;
 
-    public int damage;
-
+    public int baseHP = 30;
+    
     public int maxHP;
 
+    public float hpGrowthRate = 1.15f;
+
     public int currentHP;
+    
+    public int xp;
+    
+    // Experience required for the first level up
+    public int baseXP = 100;
 
-    public bool TakeDamage(int damage)
+    // Exponential growth rate for XP requirements
+    public float xpGrowthRate = 1.5f;
+    
+    
+    // Stats to calculate how much XP will be gained when this unit is defeated
+    public float givenXPGrowthRate = 1.2f; // 20% increase per level
+    public int givenXP;
+    
+    
+    // Awake is called before Start
+    void Awake()
     {
-        currentHP -= damage;
+        givenXP = Mathf.RoundToInt(baseXP * Mathf.Pow(xpGrowthRate, unitLevel - 1)); // 20% increase per level
+        UpdateStats();
+    }
 
+    void Start()
+    {
         if (currentHP <= 0)
         {
-            return true;
+            ResetHP();
         }
-        else
+    }
+
+    public void UpdateStats()
+    {
+        maxHP = Mathf.RoundToInt(baseHP * Mathf.Pow(hpGrowthRate, unitLevel - 1)); // 15% increase per level
+        currentHP = maxHP;
+    }
+    
+    public void GainXP(int amount)
+    {
+        xp += amount;
+        while (xp >= XPForNextLevel(unitLevel))
         {
-            return false;
+            LevelUp();
         }
     }
     
-    // Start is called before the first frame update
-    void Start()
+    private void LevelUp()
     {
-        
+        unitLevel++;
+        xp -= XPForNextLevel(unitLevel - 1); // Subtract XP required for the level-up
+        UpdateStats(); // Update stats based on new level
     }
-
-    // Update is called once per frame
-    void Update()
+    
+    private int XPForNextLevel(int level)
     {
-        
+        // Calculate the XP required for the next level
+        return Mathf.RoundToInt(baseXP * Mathf.Pow(xpGrowthRate, level - 1));
+    }
+    
+    public void ResetHP()
+    {
+        currentHP = maxHP;
     }
 }
