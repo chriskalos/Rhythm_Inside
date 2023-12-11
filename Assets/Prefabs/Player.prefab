@@ -132,5 +132,12 @@ MonoBehaviour:
   spriteRenderer: {fileID: 0}
   unitName: Space Girl
   unitLevel: 1
-  maxHP: 0
-  currentHP: 0
+  baseHP: 30
+  maxHP: 30
+  hpGrowthRate: 1.15
+  currentHP: 30
+  xp: 0
+  baseXP: 100
+  xpGrowthRate: 1.5
+  givenXPGrowthRate: 1.2
+  givenXP: 0

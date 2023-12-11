@@ -164,6 +164,10 @@ public class BattleManager : MonoBehaviour
 
     public void OnFightButtonPressed()
     {
+        if (state != BattleState.PLAYERTURN)
+        {
+            return;
+        }
         dialogueText.text = "Press the spacebar on the beat to attack!";
         buttonsPanel.SetActive(false);
         rhythmAttackPanel.SetActive(true);
@@ -171,9 +175,48 @@ public class BattleManager : MonoBehaviour
 
     public void OnCheckButtonPressed()
     {
+        if (state != BattleState.PLAYERTURN)
+        {
+            return;
+        }
         string message = "The enemy can deal damage between " + enemyUnit.unitLevel + " and " + 4 * enemyUnit.unitLevel + ".\n";
         message += "Your chance of fleeing is " + (_fleeChance * 100) + "%.";
         StartCoroutine(WaitForMessage(message));
+    }
+
+    public void OnRunButtonPressed()
+    {
+        if (state != BattleState.PLAYERTURN)
+        {
+            return;
+        }
+        buttonsPanel.SetActive(false);
+        
+        if (Random.Range(1, 100) < _fleeChance * 100)
+        {
+            StartCoroutine(HandleRunAway(true));
+        }
+        else
+        {
+            StartCoroutine(HandleRunAway(false));
+        }
+    }
+
+    IEnumerator HandleRunAway(bool success)
+    {
+        string message = success ? "You ran away successfully." : "You failed to run away!";
+        yield return StartCoroutine(WaitForMessage(message));
+
+        if (success)
+        {
+            GameManager.Instance.EndBattle();
+        }
+        else
+        {
+            state = BattleState.ENEMYTURN;
+            EnemyTurn();
+            buttonsPanel.SetActive(true);
+        }
     }
     
     public void EndAttack()
