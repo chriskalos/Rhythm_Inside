@@ -88,8 +88,6 @@ public class BattleManager : MonoBehaviour
 
     void EndBattle(BattleState state)
     {
-        // todo: end battle
-        // todo: if player wins, give player exp, return to overworld
         // todo: if player loses, game over
         
         if (state == BattleState.WON)
@@ -99,19 +97,30 @@ public class BattleManager : MonoBehaviour
             int previousLevel = playerUnit.unitLevel;
             
             playerUnit.GainXP(enemyUnit.givenXP);
-            if (playerUnit.unitLevel > previousLevel)
-            {
-                StartCoroutine(WaitForMessage(playerUnit.unitLevel + " has leveled up!"));
-            }
-            StartCoroutine(WaitForMessage(playerUnit.unitName + " won the battle!"));
-            GameManager.Instance.UpdatePlayerState(playerUnit.unitLevel, playerUnit.xp, playerUnit.currentHP);
-            GameManager.Instance.EndBattle();
+            
+            // Start a coroutine to handle the end of the battle
+            StartCoroutine(HandleEndOfBattle(playerUnit.unitLevel > previousLevel));
         }
         else if (state == BattleState.LOST)
         {
             dialogueText.text = playerUnit.unitName + " was defeated.";
             // todo: game over
         }
+    }
+    
+    IEnumerator HandleEndOfBattle(bool leveledUp)
+    {
+        yield return StartCoroutine(WaitForMessage(playerUnit.unitName + " gained " + enemyUnit.givenXP + " XP."));
+        if (leveledUp)
+        {
+            playerLevelText.text = "Level " + playerUnit.unitLevel;
+            yield return StartCoroutine(WaitForMessage(playerUnit.unitName + " has leveled up! " + playerUnit.unitName + " is now level " + playerUnit.unitLevel + "."));
+        }
+
+        yield return StartCoroutine(WaitForMessage(playerUnit.unitName + " won the battle!"));
+
+        GameManager.Instance.UpdatePlayerState(playerUnit.unitLevel, playerUnit.xp, playerUnit.currentHP);
+        GameManager.Instance.EndBattle();
     }
     
     IEnumerator DisplayMessage(string message)
