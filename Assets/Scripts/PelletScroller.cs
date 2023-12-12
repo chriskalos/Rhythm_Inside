@@ -85,7 +85,7 @@ public class PelletScroller : MonoBehaviour
     public void EndAttack()
     {
         damage = Mathf.RoundToInt(pelletCount * Mathf.Pow(GameManager.Instance.playerLevel, 1.15f)); // Scale damage by player level
-        Debug.Log("Damage dealt by " + battleManager.playerUnit.unitName + ": " + damage);
+        // Debug.Log("Damage dealt by " + battleManager.playerUnit.unitName + ": " + damage);
         battleManager.EndAttack(); // End the attack from the BattleManager
         
         // Destroy all spawned pellets

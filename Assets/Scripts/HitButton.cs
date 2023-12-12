@@ -16,8 +16,9 @@ public class HitButton : MonoBehaviour
     public bool isPressed;
     
     // Start is called before the first frame update
-    void Awake()
+    void OnEnable()
     {
+        canBePressed = false;
         isPressed = false;
         _hitButtonImage = GetComponent<Image>();
         _hitButtonImage.sprite = defaultImage;
@@ -44,8 +45,7 @@ public class HitButton : MonoBehaviour
             isPressed = false;
             pelletScroller.EndAttack();
         }
-        
-        Debug.Log(canBePressed);
+        // Debug.Log(canBePressed + " " + isPressed);
     }
 
     private void OnTriggerEnter(Collider other)

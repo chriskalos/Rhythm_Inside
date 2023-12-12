@@ -31,7 +31,7 @@ public class GameManager : MonoBehaviour
         playerLevel = 5;
         UpdatePlayerState(playerLevel, XPForNextLevel(playerLevel-1), Mathf.RoundToInt(30 * Mathf.Pow(1.15f, playerLevel - 1)));
         hud.UpdateUI();
-        Debug.Log("GameManager instantiated with:\n" + "playerLevel: " + playerLevel + ", playerXP: " + playerXP + ", playerCurrentHP: " + playerCurrentHP);
+        // Debug.Log("GameManager instantiated with:\n" + "playerLevel: " + playerLevel + ", playerXP: " + playerXP + ", playerCurrentHP: " + playerCurrentHP);
     }
 
     public void StartBattle()

@@ -39,18 +39,29 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private Slider playerHpSlider;
     [SerializeField] private Slider enemyHpSlider;
     [SerializeField] private GameObject buttonsPanel;
+    [SerializeField] private Canvas gameOverCanvas;
+    [SerializeField] private TextMeshProUGUI gameOverText;
+    [SerializeField] private AudioSource audioSource;
 
     private float _fleeChance;
 
     // Start is called before the first frame update
     void Start()
     {
+        // Initialize the PelletScroller
         _pelletScroller = pelletHolder.GetComponent<PelletScroller>();
+        
+        // Start the battle
         buttonsPanel.SetActive(false);
         state = BattleState.START;
         StartCoroutine(StartBattle());
     }
 
+    /// <summary>
+    /// Start the battle. This coroutine is called in Start().
+    /// It instantiates the player and enemy units, and sets their stats.
+    /// </summary>
+    /// <returns></returns>
     IEnumerator StartBattle()
     {
         GameObject playerGameObject = Instantiate(playerPrefab);
@@ -79,10 +90,14 @@ public class BattleManager : MonoBehaviour
 
         yield return new WaitForSeconds(3f);
         
+        // Player turn
         state = BattleState.PLAYERTURN;
         PlayerTurn();
     }
 
+    /// <summary>
+    /// Update the stats of the player and enemy units.
+    /// </summary>
     private void UpdateStats()
     {
         // Update player stats & UI
@@ -103,6 +118,10 @@ public class BattleManager : MonoBehaviour
         enemyHpStatus.text = enemyUnit.currentHP + " / " + enemyUnit.maxHP;
     }
 
+    /// <summary>
+    /// End the battle. This function is called when the player or enemy unit is defeated.
+    /// </summary>
+    /// <param name="state"></param>
     void EndBattle(BattleState state)
     {
         // todo: if player loses, game over
@@ -116,29 +135,65 @@ public class BattleManager : MonoBehaviour
             playerUnit.GainXP(enemyUnit.givenXP);
             
             // Start a coroutine to handle the end of the battle
-            StartCoroutine(HandleEndOfBattle(playerUnit.unitLevel > previousLevel));
+            StartCoroutine(HandleEndOfBattle(true, playerUnit.unitLevel > previousLevel));
         }
         else if (state == BattleState.LOST)
         {
-            dialogueText.text = playerUnit.unitName + " was defeated.";
-            // todo: game over
+            StartCoroutine(HandleEndOfBattle(false, false));
         }
     }
     
-    IEnumerator HandleEndOfBattle(bool leveledUp)
+    /// <summary>
+    /// Calculate the player's score based on their level and XP.
+    /// This is called when the player loses.
+    /// </summary>
+    /// <param name="level"></param>
+    /// <param name="xp"></param>
+    /// <param name="xpForNextLevel"></param>
+    /// <returns></returns>
+    public int CalculateScore(int level, int xp, int xpForNextLevel)
     {
-        UpdateStats();
-        yield return StartCoroutine(WaitForMessage(playerUnit.unitName + " gained " + enemyUnit.givenXP + " XP."));
-        if (leveledUp)
+        float levelProgress = (float)xp / xpForNextLevel;
+        float score = (level - 1 + levelProgress) * 1000f / 99;
+        return Mathf.RoundToInt(score);
+    }
+
+    
+    IEnumerator HandleEndOfBattle(bool won, bool leveledUp)
+    {
+        if (won)
         {
-            playerLevelText.text = "Level " + playerUnit.unitLevel;
-            yield return StartCoroutine(WaitForMessage(playerUnit.unitName + " has leveled up! " + playerUnit.unitName + " is now level " + playerUnit.unitLevel + "."));
+            UpdateStats();
+            yield return StartCoroutine(WaitForMessage(playerUnit.unitName + " gained " + enemyUnit.givenXP + " XP."));
+            if (leveledUp)
+            {
+                playerLevelText.text = "Level " + playerUnit.unitLevel;
+                yield return StartCoroutine(WaitForMessage(playerUnit.unitName + " has leveled up! " + playerUnit.unitName + " is now level " + playerUnit.unitLevel + "."));
+            }
+
+            yield return StartCoroutine(WaitForMessage(playerUnit.unitName + " won the battle!"));
+
+            GameManager.Instance.UpdatePlayerState(playerUnit.unitLevel, playerUnit.xp, playerUnit.currentHP);
+            GameManager.Instance.EndBattle();
         }
-
-        yield return StartCoroutine(WaitForMessage(playerUnit.unitName + " won the battle!"));
-
-        GameManager.Instance.UpdatePlayerState(playerUnit.unitLevel, playerUnit.xp, playerUnit.currentHP);
-        GameManager.Instance.EndBattle();
+        else
+        {
+            yield return StartCoroutine(WaitForMessage(playerUnit.unitName + " was defeated."));
+            // Fade out the audio with lerp
+            float startVolume = audioSource.volume;
+            float t = 0;
+            while (t < 1)
+            {
+                t += Time.deltaTime;
+                audioSource.volume = Mathf.Lerp(startVolume, 0, t);
+                yield return null;
+            }
+            audioSource.Stop();
+            Debug.Log("Activate the canvas");
+            gameOverCanvas.gameObject.SetActive(true);
+            float score = CalculateScore(GameManager.Instance.playerLevel, GameManager.Instance.playerXP, GameManager.Instance.playerXPForNextLevel);
+            gameOverText.text = "Game Over\nScore: " + score;
+        }
     }
     
     IEnumerator DisplayMessage(string message)
@@ -275,10 +330,10 @@ public class BattleManager : MonoBehaviour
         }
         else if (enemyUnit.currentHP <= 0)
         {
-            Debug.Log(state);
+            // Debug.Log(state);
             state = BattleState.WON;
-            Debug.Log(state);
-            Debug.Log("Calling EndBattle(state);");
+            // Debug.Log(state);
+            // Debug.Log("Calling EndBattle(state);");
             EndBattle(state);
         }
         else
