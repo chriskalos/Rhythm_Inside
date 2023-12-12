@@ -8,6 +8,10 @@ public class GameManager : MonoBehaviour
     public int playerLevel { get; private set; }
     public int playerXP { get; private set; }
     public int playerCurrentHP { get; private set; }
+    
+    public int playerXPForNextLevel { get; set; }
+
+    public HUD hud;
 
     private void Awake()
     {
@@ -24,24 +28,20 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        UpdatePlayerState(1, 0, 30);
+        playerLevel = 5;
+        UpdatePlayerState(playerLevel, XPForNextLevel(playerLevel-1), Mathf.RoundToInt(30 * Mathf.Pow(1.15f, playerLevel - 1)));
+        hud.UpdateUI();
         Debug.Log("GameManager instantiated with:\n" + "playerLevel: " + playerLevel + ", playerXP: " + playerXP + ", playerCurrentHP: " + playerCurrentHP);
     }
 
     public void StartBattle()
     {
-        // Save current state, if necessary
-        SavePlayerState();
-
         // Load the battle scene
         SceneManager.LoadScene("Battle", LoadSceneMode.Single);
     }
 
     public void EndBattle()
     {
-        // Restore the player's state, if necessary
-        RestorePlayerState();
-
         // Unload the battle scene
         SceneManager.LoadScene("Overworld", LoadSceneMode.Single);
     }
@@ -51,15 +51,23 @@ public class GameManager : MonoBehaviour
         playerLevel = level;
         playerXP = xp;
         playerCurrentHP = currentHP;
+        playerXPForNextLevel = XPForNextLevel(playerLevel);
     }
-
-    private void SavePlayerState()
+    
+    private int XPForNextLevel(int level) // Pass
     {
-        // Implement logic to save player's current state
-    }
-
-    private void RestorePlayerState()
-    {
-        // Implement logic to restore player's state
+        // Debug.Log("### GameManager.Instance.XPForNextLevel ###");
+        // Debug.Log("### level passed: " + level + " ###");
+        if (playerLevel < 100) // Max level is 100
+        {
+            if (level != 0)
+            {
+                // Calculate the XP required for the next level
+                int xpNeeded = Mathf.RoundToInt(100 * Mathf.Pow(1.2f, level + 1));
+                // Debug.Log("### xpNeeded: " + xpNeeded + " ###");
+                return xpNeeded;
+            }
+        }
+        return 0;
     }
 }

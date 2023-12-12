@@ -13,7 +13,6 @@ public class BeatPellet : MonoBehaviour
     void Start()
     {
         _pelletScroller = GetComponentInParent<PelletScroller>();
-        // todo: import BattleManager
     }
 
     // Update is called once per frame

@@ -8,6 +8,7 @@ public class PelletScroller : MonoBehaviour
     public BattleManager battleManager;
     [SerializeField] private GameObject rhythmAttackPanel;
     [SerializeField] private GameObject pelletPrefab;
+    [SerializeField] private HitButton hitButton;
 
     public int damage;
     public int pelletCount;
@@ -17,7 +18,6 @@ public class PelletScroller : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        damage = 0;
         pelletCount = 0;
         _spawnedPellets = 0;
     }
@@ -27,6 +27,7 @@ public class PelletScroller : MonoBehaviour
     {
         
     }
+
 
     /// <summary>
     /// Spawns a pellet at the right edge of the screen.
@@ -70,7 +71,6 @@ public class PelletScroller : MonoBehaviour
     public void HitPellet()
     {
         pelletCount++;
-        damage += pelletCount;
 
         if (pelletCount >= 8)
         {
@@ -84,7 +84,7 @@ public class PelletScroller : MonoBehaviour
     /// </summary>
     public void EndAttack()
     {
-        damage = Mathf.RoundToInt(damage + Mathf.Log(battleManager.playerUnit.unitLevel) * 2); // Scale damage by player level
+        damage = Mathf.RoundToInt(pelletCount * Mathf.Pow(GameManager.Instance.playerLevel, 1.15f)); // Scale damage by player level
         Debug.Log("Damage dealt by " + battleManager.playerUnit.unitName + ": " + damage);
         battleManager.EndAttack(); // End the attack from the BattleManager
         

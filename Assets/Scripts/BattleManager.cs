@@ -64,7 +64,7 @@ public class BattleManager : MonoBehaviour
         enemyUnit = enemyGameObject.GetComponent<Unit>();
         
         // Randomize enemy level based on player level
-        int enemyLevel = playerUnit.unitLevel + Random.Range(2, 6); // Enemy level is 2-5 levels higher than player level
+        int enemyLevel = Mathf.FloorToInt(playerUnit.unitLevel + Random.Range(0.8f, 1.2f)); // Enemy level is within 10% of player level
         enemyLevel = Mathf.Clamp(enemyLevel, 1, enemyUnit.unitMaxLevel); // Ensure enemy level doesn't go below 1 or above a maximum level
         
         enemyUnit.unitLevel = enemyLevel;
@@ -184,7 +184,7 @@ public class BattleManager : MonoBehaviour
         {
             return;
         }
-        string message = "The enemy can deal damage between " + enemyUnit.unitLevel + " and " + 4 * enemyUnit.unitLevel + ".\n";
+        string message = "The enemy can deal damage between " + Mathf.RoundToInt(Mathf.Pow(enemyUnit.unitLevel, 1.15f)) + " and " + 8 * Mathf.RoundToInt(Mathf.Pow(enemyUnit.unitLevel, 1.15f)) + ".\n";
         message += "Your chance of fleeing is " + (_fleeChance * 100) + "%.";
         StartCoroutine(WaitForMessage(message));
     }
@@ -290,7 +290,7 @@ public class BattleManager : MonoBehaviour
     void EnemyAttack()
     {
         // Scale attack damage with the level of the enemy realistically
-        int damageDealt = Random.Range(1, 4) * enemyUnit.unitLevel;
+        int damageDealt = Random.Range(1, 9) * Mathf.RoundToInt(Mathf.Pow(enemyUnit.unitLevel, 1.15f));
         
         Damage(playerUnit, playerHpSlider, playerHpStatus, damageDealt);
         StartCoroutine(EndEnemyTurn(damageDealt));

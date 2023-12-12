@@ -20,6 +20,8 @@ public class Unit : MonoBehaviour
     public int currentHP;
     
     public int xp;
+
+    public int totalXp;
     
     // Experience required for the first level up
     public int baseXP = 100;
@@ -59,7 +61,7 @@ public class Unit : MonoBehaviour
         if (unitLevel < unitMaxLevel)
         {
             xp += amount;
-            if (xp >= XPForNextLevel(unitLevel))
+            while (xp >= XPForNextLevel(unitLevel) && unitLevel < unitMaxLevel)
             {
                 LevelUp();
             }
@@ -74,14 +76,14 @@ public class Unit : MonoBehaviour
         currentHP = maxHP; // Fully heal the unit
     }
     
+    // I know this is really bad but it's 2 AM and I need to submit this I'm sorry
     private int XPForNextLevel(int level)
     {
         if (unitLevel < unitMaxLevel)
         {
-            // Calculate the XP required for the next level
-            return Mathf.RoundToInt(baseXP * Mathf.Pow(xpGrowthRate, level - 1));
+            int xpNeeded = Mathf.RoundToInt(100 * Mathf.Pow(1.2f, level + 1));
+            return xpNeeded;
         }
-
         return 0;
     }
     
