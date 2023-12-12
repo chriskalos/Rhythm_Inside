@@ -3,18 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Manages the spawning, movement, and interaction of pellets in the rhythm attack phase.
+/// </summary>
 public class PelletScroller : MonoBehaviour
 {
-    public BattleManager battleManager;
-    [SerializeField] private GameObject rhythmAttackPanel;
-    [SerializeField] private GameObject pelletPrefab;
-    [SerializeField] private HitButton hitButton;
+    public BattleManager battleManager; // Reference to the BattleManager for interaction with the battle system
+    [SerializeField] private GameObject rhythmAttackPanel; // The panel where the rhythm attack takes place
+    [SerializeField] private GameObject pelletPrefab; // Prefab for the pellet objects
+    [SerializeField] private HitButton hitButton; // Reference to the HitButton to detect player input
 
-    public int damage;
-    public int pelletCount;
+    public int damage; // Accumulated damage based on successful hits
+    public int pelletCount; // Count of pellets successfully hit
 
-    private int _spawnedPellets;
-    
+    private int _spawnedPellets; // Counter for the total number of pellets spawned
+
     // Start is called before the first frame update
     void Start()
     {
@@ -22,41 +25,28 @@ public class PelletScroller : MonoBehaviour
         _spawnedPellets = 0;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-
     /// <summary>
-    /// Spawns a pellet at the right edge of the screen.
-    ///
-    /// This function is called by the BeatManager
-    /// every beat.
+    /// Spawns a pellet at a specified position. Called at regular intervals by the BeatManager.
     /// </summary>
     public void SpawnPellet()
     {
-        if (rhythmAttackPanel.activeSelf && _spawnedPellets < 8)
+        if (rhythmAttackPanel.activeSelf && _spawnedPellets < 8) // Limit the maximum number of pellets
         {
+            // Create a pellet instance and position it within the rhythm attack panel
             GameObject instance = Instantiate(pelletPrefab, new Vector3(610f, 0f, -10f), Quaternion.identity);
             instance.transform.SetParent(transform, false);
-            _spawnedPellets++;
+            _spawnedPellets++; // Increment the count of spawned pellets
         }
     }
 
-    // This is a crude way of moving the pellets to the left smoothly.
-    // It was the only consistent way to keep them synced with the beat.
-    
     /// <summary>
-    /// Moves all pellets to the left by 5 units.
-    /// This function is called by the BeatManager
-    /// every 128th of a beat.
+    /// Moves all pellets to the left. Called at each fraction of a beat by the BeatManager.
     /// </summary>
     public void MoveToTheBeat()
-    {
+    { // This was the most effective way I could find to move the pellets on time.
         if (rhythmAttackPanel.activeSelf)
         {
+            // Move each pellet to the left
             foreach (BeatPellet pellet in GetComponentsInChildren<BeatPellet>())
             {
                 pellet.transform.localPosition += new Vector3(-5f, 0f, 0f);
@@ -65,36 +55,34 @@ public class PelletScroller : MonoBehaviour
     }
 
     /// <summary>
-    /// When a pellet is hit, count it and increment damage exponentially.
-    /// If the pellet count is 8, end the attack.
+    /// Called when a pellet is successfully hit. Increments the pellet count and ends the attack if necessary.
     /// </summary>
     public void HitPellet()
     {
-        pelletCount++;
+        pelletCount++; // Increment the count of successfully hit pellets
 
-        if (pelletCount >= 8)
+        if (pelletCount >= 8) // Check if all pellets have been hit
         {
-            EndAttack();
+            EndAttack(); // End the attack if all pellets are hit
         }
     }
-    
+
     /// <summary>
-    /// Ends the attack and destroys all spawned pellets.
-    /// Also calculates damage based on the player's level.
+    /// Ends the rhythm attack phase, calculates damage, and cleans up pellets.
     /// </summary>
     public void EndAttack()
     {
-        damage = Mathf.RoundToInt(pelletCount * Mathf.Pow(GameManager.Instance.playerLevel, 1.15f)); // Scale damage by player level
-        // Debug.Log("Damage dealt by " + battleManager.playerUnit.unitName + ": " + damage);
-        battleManager.EndAttack(); // End the attack from the BattleManager
-        
-        // Destroy all spawned pellets
+        // Calculate damage based on the number of pellets hit and the player's level
+        damage = Mathf.RoundToInt(pelletCount * Mathf.Pow(GameManager.Instance.playerLevel, 1.15f));
+
+        battleManager.EndAttack(); // Notify the BattleManager that the attack phase is over
+
+        // Destroy all remaining pellets
         foreach (BeatPellet pellet in GetComponentsInChildren<BeatPellet>())
         {
             Destroy(pellet.gameObject);
         }
-        
-        // Reset spawned pellet count
-        _spawnedPellets = 0;
+
+        _spawnedPellets = 0; // Reset the counter for spawned pellets
     }
 }
